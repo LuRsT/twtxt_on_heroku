@@ -1,3 +1,5 @@
+import os
+
 from dateutil import parser
 from flask import Flask, Response
 import pytz
@@ -6,14 +8,18 @@ import requests
 
 app = Flask(__name__)
 
-HEADER = """
+GSHEET_URL = os.environ.get("GSHEET_URL")
+TWTXT_USERNAME = os.environ.get("TWTXT_USERNAME")
+TWTXT_URL = os.environ.get("TWTXT_URL")
+
+HEADER = f"""
 #
 # twtxt is an open, distributed microblogging platform
 #
 # == Metadata ==
 #
-# nick = gil
-# url = https://twtxt.herokuapp.com/
+# nick = {TWTXT_USERNAME}
+# url = {TWTXT_URL}
 # user_agent = twtxt.xyz (+http://twtxt.xyz)
 #
 # == Content ==
@@ -22,7 +28,7 @@ HEADER = """
 
 @app.route('/')
 def twtxt():
-    response = requests.get("https://docs.google.com/spreadsheets/d/e/2PACX-1vT5pcDrp03CkitXKjeTZ8PCwSXHbmEmtvQVidB6XdbjhgmIc8Y6snNZK5XZU2-VhapSXWPZwsSYNf6q/pub?output=csv")
+    response = requests.get(GSHEET_URL)
 
     twtxts = response.text.replace(",", "\t")
     formatted_lines = []
