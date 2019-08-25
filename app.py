@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import Response
 import requests
 
 
@@ -23,4 +24,4 @@ def twtxt():
     response = requests.get("https://docs.google.com/spreadsheets/d/e/2PACX-1vT5pcDrp03CkitXKjeTZ8PCwSXHbmEmtvQVidB6XdbjhgmIc8Y6snNZK5XZU2-VhapSXWPZwsSYNf6q/pub?output=csv")
 
     body = HEADER + response.text.replace(",", "\t")
-    return body
+    return Response(body, mimetype='text/text')
