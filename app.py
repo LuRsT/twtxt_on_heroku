@@ -37,6 +37,14 @@ HEADER = f"""
 #
 """
 
+def _format_timestamp(date):
+    # TODO Make this configurable
+    csv_tz = pytz.timezone('Europe/London')
+    dt = parser.parse(date).replace(tzinfo=csv_tz)
+    formatted_date = '{:%FT%T%z}'.format(dt.astimezone(pytz.UTC))
+    return formatted_date
+
+
 @app.route('/')
 def twtxt():
     response = requests.get(GSHEET_URL)
@@ -45,9 +53,7 @@ def twtxt():
     formatted_lines = []
     for line in twtxts.split("\n"):
         date, *content = line.split("\t")
-        dt = parser.parse(date)
-        formatted_date = str(dt.astimezone(pytz.timezone('Europe/London'))).replace(" ", "T")
-        formatted_lines.append("\t".join([formatted_date, "".join(content)]))
+        formatted_lines.append("\t".join([_format_timestamp(date), "".join(content)]))
 
     body = HEADER + "\n".join(formatted_lines)
     return Response(body, mimetype='text/plain')
