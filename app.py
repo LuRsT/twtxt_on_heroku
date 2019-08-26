@@ -14,7 +14,18 @@ TWTXT_URL = os.environ.get("TWTXT_URL")
 
 HEADER = f"""
 #
-# twtxt is an open, distributed microblogging platform
+# __            __         __
+#|  |_.--.--.--|  |_.--.--|  |_
+#|   _|  |  |  |   _|_   _|   _|
+#|____|________|____|__.__|____|
+#
+# twtxt is an open, distributed
+# microblogging platform that
+# uses human-readable text files,
+# common transport protocols, and
+# free software.
+#
+# Learn more about twtxt at https://github.com/buckket/twtxt
 #
 # == Metadata ==
 #
@@ -33,10 +44,10 @@ def twtxt():
     twtxts = response.text.replace(",", "\t")
     formatted_lines = []
     for line in twtxts.split("\n"):
-        date, content = line.split("\t")
+        date, *content = line.split("\t")
         dt = parser.parse(date)
-        formatted_date = dt.astimezone(pytz.timezone('Europe/London'))
-        formatted_lines.append("\t".join([str(formatted_date), content]))
+        formatted_date = str(dt.astimezone(pytz.timezone('Europe/London'))).replace(" ", "T")
+        formatted_lines.append("\t".join([formatted_date, "".join(content)]))
 
     body = HEADER + "\n".join(formatted_lines)
     return Response(body, mimetype='text/plain')
