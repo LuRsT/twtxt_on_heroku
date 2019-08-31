@@ -11,6 +11,7 @@ app = Flask(__name__)
 GSHEET_URL = os.environ.get("GSHEET_URL")
 TWTXT_USERNAME = os.environ.get("TWTXT_USERNAME")
 TWTXT_URL = os.environ.get("TWTXT_URL")
+TIMEZONE = os.environ.get("TIMEZONE", "Europe/London")
 
 HEADER = f"""
 #
@@ -38,8 +39,7 @@ HEADER = f"""
 """
 
 def _format_timestamp(date):
-    # TODO Make this configurable
-    csv_tz = pytz.timezone('Europe/London')
+    csv_tz = pytz.timezone(TIMEZONE)
     dt = parser.parse(date).replace(tzinfo=csv_tz)
     formatted_date = '{:%FT%T%z}'.format(dt.astimezone(pytz.UTC))
     return formatted_date
