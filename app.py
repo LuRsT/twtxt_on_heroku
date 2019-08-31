@@ -51,7 +51,13 @@ def render_csv(csv_content):
     formatted_lines = []
     for line in twtxts.split("\n"):
         date, *content = line.split("\t")
-        formatted_lines.append("\t".join([_format_timestamp(date), "".join(content)]))
+        try:
+            timestamp = _format_timestamp(date)
+        except ValueError:
+            # No timestamp, no post, this way, one can write drafts
+            continue
+        else:
+            formatted_lines.append("\t".join([timestamp, "".join(content)]))
     return "\n".join(formatted_lines)
 
 
