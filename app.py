@@ -1,3 +1,5 @@
+from io import StringIO
+import csv
 import os
 
 from dateutil import parser
@@ -47,17 +49,23 @@ def twtxt():
 
 
 def render_csv(csv_content):
-    twtxts = csv_content.replace(",", "\t")
+    csv_reader = csv.reader(StringIO(csv_content))
     formatted_lines = []
-    for line in twtxts.split("\n"):
-        date, *content = line.split("\t")
+    for line in csv_reader:
+        if len(line) < 2:
+            continue
+
+        date, content, *_ = line
         try:
             timestamp = _format_timestamp(date)
         except ValueError:
             # No timestamp, no post, this way, one can write drafts
             continue
         else:
-            formatted_lines.append("\t".join([timestamp, "".join(content)]))
+            content = "".join(content)
+            if content.startswith("\"") and content.endswith("\""):
+                content = content[1:-1]
+            formatted_lines.append("\t".join([timestamp, content]))
     return "\n".join(formatted_lines)
 
 
