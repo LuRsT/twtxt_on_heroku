@@ -38,22 +38,25 @@ HEADER = f"""
 #
 """
 
+
+@app.route('/')
+def twtxt():
+    response = requests.get(GSHEET_URL)
+    body = HEADER + render_csv(response.text)
+    return Response(body, mimetype='text/plain')
+
+
+def render_csv(csv_content):
+    twtxts = csv_content.replace(",", "\t")
+    formatted_lines = []
+    for line in twtxts.split("\n"):
+        date, *content = line.split("\t")
+        formatted_lines.append("\t".join([_format_timestamp(date), "".join(content)]))
+    return "\n".join(formatted_lines)
+
+
 def _format_timestamp(date):
     csv_tz = pytz.timezone(TIMEZONE)
     dt = parser.parse(date).replace(tzinfo=csv_tz)
     formatted_date = '{:%FT%T%z}'.format(dt.astimezone(pytz.UTC))
     return formatted_date
-
-
-@app.route('/')
-def twtxt():
-    response = requests.get(GSHEET_URL)
-
-    twtxts = response.text.replace(",", "\t")
-    formatted_lines = []
-    for line in twtxts.split("\n"):
-        date, *content = line.split("\t")
-        formatted_lines.append("\t".join([_format_timestamp(date), "".join(content)]))
-
-    body = HEADER + "\n".join(formatted_lines)
-    return Response(body, mimetype='text/plain')
